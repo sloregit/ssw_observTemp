@@ -12,13 +12,20 @@ const request: AjaxRequest = {
 };
 //const temp: Observable<AjaxResponse<any>> = ajax(request);
 const numbers = range(0,4);
+var currentTemp = 0;
 
 const obs: Observable<any> = new Observable((subscriber) =>
   interval(10000).subscribe({
     next: () => {
         ajax(request).subscribe({
-          next: (res: AjaxResponse<any>) =>
-            subscriber.next(res.response.main.temp), 
+          next: (res: AjaxResponse<any>) =>{
+          if(res.response.main.temp !== currentTemp){
+            currentTemp = res.response.main.temp
+            subscriber.next(currentTemp)
+          } else{
+            subscriber.next(res.response.main.temp)
+          }
+        },          
           error: (err: AjaxError) => console.error('Error: ', err.response),
           complete: () =>{subscriber.unsubscribe()}
         }) }}));
